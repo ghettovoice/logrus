@@ -68,8 +68,9 @@ func (f *TextFormatter) init(entry *Entry) {
 // Format renders a single log entry
 func (f *TextFormatter) Format(entry *Entry) ([]byte, error) {
 	var b *bytes.Buffer
-	keys := make([]string, 0, len(entry.Data))
-	for k := range entry.Data {
+	fields := entry.Fields()
+	keys := make([]string, 0, len(fields))
+	for k := range fields {
 		keys = append(keys, k)
 	}
 
@@ -82,7 +83,7 @@ func (f *TextFormatter) Format(entry *Entry) ([]byte, error) {
 		b = &bytes.Buffer{}
 	}
 
-	prefixFieldClashes(entry.Data)
+	prefixFieldClashes(fields)
 
 	f.Do(func() { f.init(entry) })
 
@@ -103,7 +104,7 @@ func (f *TextFormatter) Format(entry *Entry) ([]byte, error) {
 			f.appendKeyValue(b, "msg", entry.Message)
 		}
 		for _, key := range keys {
-			f.appendKeyValue(b, key, entry.Data[key])
+			f.appendKeyValue(b, key, fields[key])
 		}
 	}
 
@@ -134,7 +135,7 @@ func (f *TextFormatter) printColored(b *bytes.Buffer, entry *Entry, keys []strin
 		fmt.Fprintf(b, "\x1b[%dm%s\x1b[0m[%s] %-44s ", levelColor, levelText, entry.Time.Format(timestampFormat), entry.Message)
 	}
 	for _, k := range keys {
-		v := entry.Data[k]
+		v := entry.Field(k)
 		fmt.Fprintf(b, " \x1b[%dm%s\x1b[0m=", levelColor, k)
 		f.appendValue(b, v)
 	}

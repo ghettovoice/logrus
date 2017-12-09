@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -126,7 +127,7 @@ func TestJSONMessageKey(t *testing.T) {
 		},
 	}
 
-	b, err := formatter.Format(&Entry{Message: "oh hai"})
+	b, err := formatter.Format(&Entry{Message: "oh hai", mu: new(sync.RWMutex)})
 	if err != nil {
 		t.Fatal("Unable to format entry: ", err)
 	}
