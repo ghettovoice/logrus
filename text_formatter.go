@@ -94,7 +94,7 @@ func (f *TextFormatter) Format(entry *Entry) ([]byte, error) {
 		timestampFormat = defaultTimestampFormat
 	}
 	if isColored {
-		f.printColored(b, entry, keys, timestampFormat)
+		f.printColored(b, entry, keys, fields, timestampFormat)
 	} else {
 		if !f.DisableTimestamp {
 			f.appendKeyValue(b, "time", entry.Time.Format(timestampFormat))
@@ -112,7 +112,7 @@ func (f *TextFormatter) Format(entry *Entry) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (f *TextFormatter) printColored(b *bytes.Buffer, entry *Entry, keys []string, timestampFormat string) {
+func (f *TextFormatter) printColored(b *bytes.Buffer, entry *Entry, keys []string, fields Fields, timestampFormat string) {
 	var levelColor int
 	switch entry.Level {
 	case DebugLevel:
@@ -135,7 +135,7 @@ func (f *TextFormatter) printColored(b *bytes.Buffer, entry *Entry, keys []strin
 		fmt.Fprintf(b, "\x1b[%dm%s\x1b[0m[%s] %-44s ", levelColor, levelText, entry.Time.Format(timestampFormat), entry.Message)
 	}
 	for _, k := range keys {
-		v := entry.Field(k)
+		v := fields[k]
 		fmt.Fprintf(b, " \x1b[%dm%s\x1b[0m=", levelColor, k)
 		f.appendValue(b, v)
 	}
