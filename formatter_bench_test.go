@@ -2,6 +2,7 @@ package logrus
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 )
@@ -88,6 +89,7 @@ func doBenchmark(b *testing.B, formatter Formatter, fields Fields) {
 		Message: "message",
 		Data:    fields,
 		Logger:  logger,
+		mu:      new(sync.RWMutex),
 	}
 	var d []byte
 	var err error
